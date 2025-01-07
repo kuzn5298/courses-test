@@ -60,7 +60,13 @@ jobs:
             fi
           done
 
-      # 4. Деплой на GitHub Pages
+      # 4. Проверка содержимого папки перед деплоем
+      - name: Check deploy content
+        run: |
+          echo "Contents of the deploy directory:"
+          ls -R deploy  # Проверим, есть ли index.html в deploy
+
+      # 5. Деплой на GitHub Pages
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
