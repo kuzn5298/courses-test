@@ -1,79 +1,35 @@
-name: Deploy Projects with Build Step
+name: Deploy Angular Project to GitHub Pages
 
 on:
   push:
     branches:
-      - main # Запуск при пуше в main ветку
+      - angular-project
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Клонируем репозиторий
+      # 1. Checkout исходного кода
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # 2. Устанавливаем Node.js
+      # 2. Установка Node.js
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '18' # Укажите свою версию Node.js
 
-      # 3. Собираем и деплоим каждый проект
-      - name: Build and deploy changed projects
+      # 3. Установка зависимостей и сборка Angular проекта
+      - name: Install dependencies and build Angular project
         run: |
-          mkdir -p deploy  # Создаем папку для всех проектов
+          npm install
+          npm run build --prod
 
-          # Список всех папок (проектов) в репозитории
-          PROJECTS=$(ls -d */)
-
-          for project in $PROJECTS; do
-            if [ -d "$project" ]; then
-              echo "Processing $project..."
-
-              # Переходим в директорию проекта
-              cd $project
-
-              # Проверяем наличие package.json, если есть - выполняем сборку
-              if [ -f "package.json" ]; then
-                echo "Running npm install and build for $project..."
-                npm install
-                npm run build || { echo "Build failed for $project"; exit 1; }
-              else
-                echo "No package.json in $project. Skipping..."
-              fi
-
-              # Создаем директорию для каждого проекта в папке deploy
-              mkdir -p "../deploy/$project"
-
-              # Копируем собранные файлы в папку для деплоя
-              if [ -d "dist/browser" ]; then
-                # Для Angular
-                echo "Copying Angular dist/browser folder for $project..."
-                cp -r dist/browser/* ../deploy/$project
-              elif [ -d "dist" ]; then
-                # Для React
-                echo "Copying React dist folder for $project..."
-                cp -r dist/* ../deploy/$project
-              else
-                echo "No dist or dist/browser folder found for $project. Skipping..."
-              fi
-
-              # Возвращаемся в корневую папку
-              cd ..
-            fi
-          done
-
-      # 4. Проверка содержимого папки перед деплоем
-      - name: Check deploy content
-        run: |
-          echo "Contents of the deploy directory:"
-          ls -R deploy  # Проверим, есть ли index.html в deploy
-
-      # 5. Деплой на GitHub Pages
+      # 4. Деплой на GitHub Pages
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./deploy
+          publish_dir: ./dist/browser # Указываем путь до собранного проекта для Angular
+          destination_dir: angular-project # Указываем папку, куда деплоим на gh-pages
