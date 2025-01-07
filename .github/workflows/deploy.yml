@@ -1,9 +1,7 @@
-name: Deploy Vanilla JS to GitHub Pages
+name: Deploy main
 
 on:
-  push:
-    branches:
-      - main
+  workflow_dispatch:
 
 jobs:
   deploy:
