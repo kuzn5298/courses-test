@@ -3,7 +3,7 @@ name: Deploy Projects with Build Step
 on:
   push:
     branches:
-      - main # Триггер срабатывает при пуше в ветку main
+      - main # Запуск при пуше в main ветку
 
 jobs:
   deploy:
@@ -18,64 +18,49 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18' # Вы можете изменить версию Node.js, если нужно
+          node-version: '18' # Укажите свою версию Node.js
 
-      # 3. Определяем изменённые проекты
-      - name: Identify changed projects
-        id: changes
-        run: |
-          if [ "${{ github.event.before }}" = "0000000000000000000000000000000000000000" ]; then
-            # Если это первый коммит в ветке
-            CHANGED_PROJECTS=$(ls -d */ | cut -d'/' -f1)
-          else
-            # Если есть предыдущий коммит
-            CHANGED_PROJECTS=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | cut -d'/' -f1 | uniq)
-          fi
-          echo "Changed projects: $CHANGED_PROJECTS"
-          echo "changed_projects=$CHANGED_PROJECTS" >> $GITHUB_ENV
-
-      # 4. Обрабатываем изменённые проекты
-      - name: Build and copy projects
+      # 3. Собираем и деплоим каждый проект
+      - name: Build and deploy changed projects
         run: |
           mkdir -p deploy
-          for project in ${{ env.changed_projects }}; do
+
+          # Список всех папок (проектов) в репозитории
+          PROJECTS=$(ls -d */)
+
+          for project in $PROJECTS; do
             if [ -d "$project" ]; then
               echo "Processing $project..."
 
-              # Переходим в папку проекта
+              # Переходим в директорию проекта
               cd $project
 
-              # Устанавливаем зависимости
+              # Проверяем наличие package.json, если есть - выполняем сборку
               if [ -f "package.json" ]; then
-                echo "Installing dependencies for $project..."
+                echo "Running npm install and build for $project..."
                 npm install
+                npm run build || { echo "Build failed for $project"; exit 1; }
               else
-                echo "No package.json found in $project. Skipping npm install."
+                echo "No package.json in $project. Skipping..."
               fi
 
-              # Запускаем сборку
-              if [ -f "package.json" ]; then
-                echo "Building $project..."
-                npm run build || echo "Build failed for $project. Skipping deployment."
-              fi
-
-              # Проверяем, где находятся файлы для деплоя
+              # Копируем собранные файлы в папку для деплоя
               if [ -d "dist" ]; then
-                echo "Copying files from dist for $project..."
+                echo "Copying dist folder for $project..."
                 cp -r dist ../deploy/$project
               elif [ -d "build" ]; then
-                echo "Copying files from build for $project..."
+                echo "Copying build folder for $project..."
                 cp -r build ../deploy/$project
               else
-                echo "No dist or build folder found for $project. Skipping deployment."
+                echo "No dist or build folder found for $project. Skipping..."
               fi
 
-              # Возвращаемся в корневую директорию
+              # Возвращаемся в корневую папку
               cd ..
             fi
           done
 
-      # 5. Деплой на GitHub Pages
+      # 4. Деплой на GitHub Pages
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
