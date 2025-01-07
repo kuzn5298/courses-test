@@ -23,7 +23,7 @@ jobs:
       - name: Install dependencies and build
         run: |
           npm install
-          npm run build
+          npm run build--prod
 
       - name: Deploy to gh-pages (angular-project)
         uses: peaceiris/actions-gh-pages@v3
