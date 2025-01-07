@@ -24,7 +24,13 @@ jobs:
       - name: Identify changed projects
         id: changes
         run: |
-          CHANGED_PROJECTS=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | cut -d'/' -f1 | uniq)
+          if [ "${{ github.event.before }}" = "0000000000000000000000000000000000000000" ]; then
+            # Если это первый коммит в ветке
+            CHANGED_PROJECTS=$(ls -d */ | cut -d'/' -f1)
+          else
+            # Если есть предыдущий коммит
+            CHANGED_PROJECTS=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | cut -d'/' -f1 | uniq)
+          fi
           echo "Changed projects: $CHANGED_PROJECTS"
           echo "changed_projects=$CHANGED_PROJECTS" >> $GITHUB_ENV
 
