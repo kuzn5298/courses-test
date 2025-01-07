@@ -45,14 +45,16 @@ jobs:
               fi
 
               # Копируем собранные файлы в папку для деплоя
-              if [ -d "dist" ]; then
-                echo "Copying dist folder for $project..."
-                cp -r dist ../deploy/$project
-              elif [ -d "build" ]; then
-                echo "Copying build folder for $project..."
-                cp -r build ../deploy/$project
+              if [ -d "dist/browser" ]; then
+                # Для Angular
+                echo "Copying Angular dist/browser folder for $project..."
+                cp -r dist/browser/* ../deploy/$project
+              elif [ -d "dist" ]; then
+                # Для React
+                echo "Copying React dist folder for $project..."
+                cp -r dist/* ../deploy/$project
               else
-                echo "No dist or build folder found for $project. Skipping..."
+                echo "No dist or dist/browser folder found for $project. Skipping..."
               fi
 
               # Возвращаемся в корневую папку
