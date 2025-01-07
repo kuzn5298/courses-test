@@ -23,7 +23,7 @@ jobs:
       # 3. Собираем и деплоим каждый проект
       - name: Build and deploy changed projects
         run: |
-          mkdir -p deploy
+          mkdir -p deploy  # Создаем папку для всех проектов
 
           # Список всех папок (проектов) в репозитории
           PROJECTS=$(ls -d */)
@@ -43,6 +43,9 @@ jobs:
               else
                 echo "No package.json in $project. Skipping..."
               fi
+
+              # Создаем директорию для каждого проекта в папке deploy
+              mkdir -p "../deploy/$project"
 
               # Копируем собранные файлы в папку для деплоя
               if [ -d "dist/browser" ]; then
