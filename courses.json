@@ -42,6 +42,16 @@
             "url": "https://github.com/kuzn5298/courses/tree/easy-track"
           }
         ]
+      },
+      {
+        "name": "Easy Track",
+        "url": "https://courses.kuzn.dev/easy-track/",
+        "branches": [
+          {
+            "name": "easy-track",
+            "url": "https://github.com/kuzn5298/courses/tree/easy-track"
+          }
+        ]
       }
     ]
   }
