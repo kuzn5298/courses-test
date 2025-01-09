@@ -17,3 +17,7 @@ This repository showcases projects completed during various courses. Each projec
 > **Name:** Burger Builder<br>
 > **Branches:** [burger-builder](https://github.com/kuzn5298/courses/tree/easy-track)<br>
 > **Live Preview:** [Burger Builder](https://courses.kuzn.dev/burger-builder/)<br>
+
+> **Name:** Easy Track<br>
+> **Branches:** [easy-track](https://github.com/kuzn5298/courses/tree/easy-track)<br>
+> **Live Preview:** [Easy Track](https://courses.kuzn.dev/easy-track/)<br>
